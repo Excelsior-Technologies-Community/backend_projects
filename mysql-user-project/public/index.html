@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySQL User & Product System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-blue-500/20">
+          🐬
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-slate-900 leading-tight">MySQL User & Product System</h1>
+          </div>
+          <p class="text-xs text-slate-500">OTP Auth • JWT Security • Multer Upload • Disk Storage</p>
+        </div>
+      </div>
+
+      <!-- Right: User Session & DB Status -->
+      <div class="flex items-center space-x-3">
+        <!-- DB Status Pill -->
+        <div id="dbStatusPill" class="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          <span id="dbStatusText">Checking MySQL...</span>
+        </div>
+
+        <!-- User Session Pill -->
+        <div id="userBadge" class="hidden items-center space-x-2 bg-blue-50 border border-blue-200 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="userNameDisplay">User</span>
+          <button onclick="logout()" class="ml-1 text-slate-400 hover:text-rose-600 font-bold cursor-pointer" title="Logout">✕</button>
+        </div>
+
+        <div id="guestBadge" class="flex items-center space-x-1.5 bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span>Guest (Logged Out)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex space-x-6 text-sm font-medium">
+      <button id="tabAuthBtn" onclick="switchTab('auth')" class="py-3 border-b-2 border-blue-600 text-blue-600 font-semibold focus:outline-none cursor-pointer flex items-center gap-2">
+        <span>🔐</span> Authentication & OTP
+      </button>
+      <button id="tabProductsBtn" onclick="switchTab('products')" class="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 focus:outline-none cursor-pointer flex items-center gap-2">
+        <span>📦</span> Product Catalog & Management
+      </button>
+      <button id="tabDocsBtn" onclick="switchTab('docs')" class="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 focus:outline-none cursor-pointer flex items-center gap-2">
+        <span>📑</span> Schema & API Guide
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Global Alert / DB Banner -->
+    <div id="dbAlertBanner" class="hidden rounded-xl border p-4 text-xs flex items-start justify-between">
+      <div class="flex items-start space-x-3">
+        <span id="dbAlertIcon" class="text-xl">⚙️</span>
+        <div>
+          <p id="dbAlertTitle" class="font-bold text-sm"></p>
+          <p id="dbAlertMsg" class="mt-0.5"></p>
+        </div>
+      </div>
+      <button onclick="checkHealth()" class="px-2.5 py-1 bg-white border border-slate-300 rounded shadow-sm text-slate-700 hover:bg-slate-50 font-medium text-xs">
+        Refresh Status
+      </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform transition-all duration-300 translate-y-20 opacity-0 pointer-events-none max-w-md w-full bg-slate-900 text-white p-4 rounded-xl shadow-2xl flex items-center justify-between border border-slate-800">
+      <div class="flex items-center space-x-3">
+        <span id="toastIcon" class="text-xl">✅</span>
+        <span id="toastMsg" class="text-xs font-medium">Notification message</span>
+      </div>
+      <button onclick="hideToast()" class="text-slate-400 hover:text-white font-bold ml-4 text-sm cursor-pointer">✕</button>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 1: AUTHENTICATION & OTP -->
+    <!-- ======================================================== -->
+    <div id="authSection" class="space-y-6">
+
+      <!-- Flow Walkthrough Helper -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 text-xs text-blue-900 flex items-start space-x-3 shadow-sm">
+        <div>
+          <p class="font-bold text-sm text-blue-950">How Verification Flow Works:</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2 text-blue-800">
+            <div class="bg-white/80 p-2.5 border border-blue-100">
+              <span class="font-bold">1. Registration</span>
+              <p class="text-[12px] text-slate-600 mt-0.5">Password hashed with bcrypt. 6-digit OTP generated (valid 10 mins) and sent via Nodemailer.</p>
+            </div>
+            <div class="bg-white/80 p-2.5 border border-blue-100">
+              <span class="font-bold">2. OTP Verification</span>
+              <p class="text-[12px] text-slate-600 mt-0.5">Submits OTP code with expiry check. Unverified users can resend OTP after 60s cooldown.</p>
+            </div>
+            <div class="bg-white/80 p-2.5 border border-blue-100">
+              <span class="font-bold">3. JWT Login</span>
+              <p class="text-[12px] text-slate-600 mt-0.5">Only verified users can log in. Returns signed JWT token used for product CRUD actions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Column Card Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Card 1: Register User -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h2 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <span>1️⃣</span> Register Account
+              </h2>
+              <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">Step 1</span>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                <input type="text" id="regName" required placeholder="John Doe" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                <input type="email" id="regEmail" required placeholder="john@example.com" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Password (min 6 chars)</label>
+                <input type="password" id="regPassword" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <button type="submit" id="regBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition cursor-pointer shadow-sm">
+                Register & Send OTP
+              </button>
+            </form>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-4 text-center">Stores user as unverified in MySQL</p>
+        </div>
+
+        <!-- Card 2: Verify & Resend OTP -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h2 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <span>2️⃣</span> Verify OTP
+              </h2>
+              <span class="text-[11px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-semibold">Step 2</span>
+            </div>
+
+            <form id="verifyForm" onsubmit="handleVerify(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                <input type="email" id="verifyEmail" required placeholder="john@example.com" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">6-Digit OTP Code</label>
+                <input type="text" id="verifyOtp" required maxlength="6" pattern="[0-9]{6}" placeholder="123456" class="w-full px-3 py-2 text-xs tracking-widest font-mono text-center font-bold text-amber-600 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                <span class="text-[10px] text-slate-400 mt-1 block">Valid for 10 minutes</span>
+              </div>
+
+              <button type="submit" id="verifyBtn" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition cursor-pointer shadow-sm">
+                Verify Email
+              </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500">Didn't receive code?</span>
+              <button type="button" id="resendBtn" onclick="handleResendOTP()" class="text-xs font-semibold text-blue-600 hover:underline cursor-pointer">
+                Resend OTP
+              </button>
+            </div>
+            <p id="cooldownText" class="hidden text-[10px] text-rose-500 text-right mt-1"></p>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-4 text-center">Marks is_verified = TRUE in MySQL</p>
+        </div>
+
+        <!-- Card 3: User Login -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h2 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <span>3️⃣</span> Login & JWT
+              </h2>
+              <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold">Step 3</span>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                <input type="email" id="loginEmail" required placeholder="john@example.com" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+                <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+
+              <button type="submit" id="loginBtn" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition cursor-pointer shadow-sm">
+                Login with JWT
+              </button>
+            </form>
+
+            <div id="activeSessionBox" class="hidden mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
+              <div class="flex items-center justify-between font-bold">
+                <span>Session Active</span>
+                <button onclick="logout()" class="text-rose-600 text-[11px] hover:underline cursor-pointer">Logout</button>
+              </div>
+              <p id="activeUserEmail" class="text-[11px] text-emerald-700 mt-0.5 truncate"></p>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-4 text-center">Strictly blocks unverified accounts</p>
+        </div>
+
+      </div>
+
+      <!-- Quick Auth Tester Console / Response Box -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <span>💻</span> Live API Server Response
+          </span>
+          <button onclick="clearResponse()" class="text-[11px] text-slate-400 hover:text-slate-600">Clear</button>
+        </div>
+        <pre id="apiConsole" class="bg-slate-900 text-emerald-400 p-3 rounded-lg text-xs font-mono overflow-x-auto max-h-48 whitespace-pre-wrap">// Action logs and JSON responses will appear here...</pre>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: PRODUCTS MANAGEMENT -->
+    <!-- ======================================================== -->
+    <div id="productsSection" class="hidden space-y-6">
+
+      <!-- Action Toolbar & Search -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+
+        <!-- Search & Filter -->
+        <div class="flex flex-wrap gap-2 w-full md:w-auto flex-1 max-w-xl">
+          <div class="relative flex-1 min-w-[200px]">
+            <input type="text" id="searchInput" placeholder="Search products by title or description..." oninput="handleSearchDebounce()" class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+          </div>
+
+          <select id="categoryFilter" onchange="loadProducts(1)" class="px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            <option value="">All Categories</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Books">Books</option>
+            <option value="Home & Kitchen">Home & Kitchen</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+
+        <!-- Add Product Button -->
+        <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+          <button onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+            <span>➕</span> Add New Product
+          </button>
+          <button onclick="loadProducts(1)" class="p-2 border border-slate-300 hover:bg-slate-50 text-slate-600 rounded-lg text-xs cursor-pointer" title="Refresh">
+            🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- Auth Warning if not logged in -->
+      <div id="productAuthNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-xs flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span>⚠️</span>
+          <span>You are currently in <strong>Read-Only Mode</strong>. Log in with a verified account to Create, Edit, or Delete products.</span>
+        </div>
+        <button onclick="switchTab('auth')" class="font-bold underline text-amber-900 cursor-pointer">Login Now</button>
+      </div>
+
+      <!-- Products Grid -->
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Products dynamically rendered here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-slate-200 p-8">
+        <span class="text-4xl">📦</span>
+        <h3 class="text-sm font-bold text-slate-800 mt-2">No Products Found</h3>
+        <p class="text-xs text-slate-500 mt-1">Try adjusting your search filter or click "Add New Product" to create one.</p>
+      </div>
+
+      <!-- Pagination Bar -->
+      <div id="paginationBar" class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between text-xs">
+        <span id="pageInfo" class="text-slate-600">Showing 0 products</span>
+        <div class="flex items-center space-x-2">
+          <button id="prevPageBtn" onclick="changePage(-1)" disabled class="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50">
+            Previous
+          </button>
+          <span id="currentPageNum" class="font-bold px-2">1</span>
+          <button id="nextPageBtn" onclick="changePage(1)" disabled class="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50">
+            Next
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: SCHEMA & API DOCUMENTATION -->
+    <!-- ======================================================== -->
+    <div id="docsSection" class="hidden space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- MySQL Table Schemas -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <span>🗄️</span> MySQL Database Schema
+            </h2>
+            <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-mono">schema.sql</span>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-800 mb-1">1. `users` Table</h3>
+            <pre class="bg-slate-900 text-slate-200 p-3 rounded-lg text-[11px] font-mono overflow-x-auto">CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  is_verified BOOLEAN DEFAULT FALSE,
+  otp VARCHAR(10) DEFAULT NULL,
+  otp_expires_at DATETIME DEFAULT NULL,
+  otp_last_sent_at DATETIME DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_users_email (email),
+  INDEX idx_users_is_verified (is_verified)
+);</pre>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-800 mb-1">2. `products` Table</h3>
+            <pre class="bg-slate-900 text-slate-200 p-3 rounded-lg text-[11px] font-mono overflow-x-auto">CREATE TABLE products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  description TEXT DEFAULT NULL,
+  price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  category VARCHAR(100) DEFAULT 'General',
+  stock INT NOT NULL DEFAULT 0,
+  image_url VARCHAR(500) NOT NULL,
+  image_filename VARCHAR(255) DEFAULT NULL,
+  image_size INT DEFAULT 0,
+  created_by INT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_products_user FOREIGN KEY (created_by)
+    REFERENCES users(id) ON DELETE CASCADE
+);</pre>
+          </div>
+        </div>
+
+        <!-- Endpoints List -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <span>📡</span> REST API Endpoints
+            </h2>
+            <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono">10 Endpoints</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-blue-700">POST /api/auth/register</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Registers user, validates inputs, hashes password, generates 6-digit OTP, sends Nodemailer email.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-amber-700">POST /api/auth/verify-otp</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Validates OTP code, checks 10-minute expiry, marks user verified in MySQL.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-purple-700">POST /api/auth/resend-otp</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Resends OTP with 60-second cooldown protection for unverified users.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-emerald-700">POST /api/auth/login</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Authenticates password, ensures is_verified = TRUE, issues signed JWT token.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-indigo-700">POST /api/products</span>
+              <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded ml-1 font-mono">Protected</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Multer validates the image (JPG, PNG, WEBP, 5MB limit) and uploads it to Cloudinary. The image URL and product details are saved in MySQL.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-indigo-700">PUT /api/products/:id</span>
+              <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded ml-1 font-mono">Protected</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Updates product. A new image replaces the old Cloudinary image automatically.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+              <span class="font-bold text-rose-700">DELETE /api/products/:id</span>
+              <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded ml-1 font-mono">Protected</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">Deletes product from MySQL and attempts to remove its Cloudinary image.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CREATE PRODUCT -->
+  <!-- ======================================================== -->
+  <div id="createModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <span>➕</span> Create New Product
+        </h3>
+        <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="createProductForm" onsubmit="handleCreateProduct(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Product Title *</label>
+          <input type="text" id="createTitle" required placeholder="Wireless Noise Cancelling Headphones" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Price ($) *</label>
+            <input type="number" step="0.01" min="0" id="createPrice" required placeholder="99.99" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Stock Quantity</label>
+            <input type="number" min="0" id="createStock" value="10" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+          <select id="createCategory" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Books">Books</option>
+            <option value="Home & Kitchen">Home & Kitchen</option>
+            <option value="General" selected>General</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+          <textarea id="createDesc" rows="2" placeholder="High performance Bluetooth audio..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <!-- File Upload Field -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Product Image * <span class="text-slate-400 font-normal">(JPG, JPEG, PNG, WEBP — Max 5MB)</span>
+          </label>
+          <input type="file" id="createImage" accept=".jpg,.jpeg,.png,.webp" required onchange="previewImage(this, 'createImgPreview')" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+          <div id="createImgPreview" class="hidden mt-2 border border-slate-200 rounded-lg p-1 w-24 h-24 overflow-hidden flex items-center justify-center bg-slate-50">
+            <img class="w-full h-full object-cover rounded" src="" alt="Preview">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeCreateModal()" class="px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" id="createSubmitBtn" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer shadow-sm">
+            Upload & Save Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDIT PRODUCT (WITH IMAGE REPLACEMENT) -->
+  <!-- ======================================================== -->
+  <div id="editModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <span>✏️</span> Edit Product & Replace Image
+        </h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="editProductForm" onsubmit="handleUpdateProduct(event)" class="space-y-3">
+        <input type="hidden" id="editProductId">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Product Title</label>
+          <input type="text" id="editTitle" required class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Price ($)</label>
+            <input type="number" step="0.01" min="0" id="editPrice" required class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Stock</label>
+            <input type="number" min="0" id="editStock" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+          <select id="editCategory" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Books">Books</option>
+            <option value="Home & Kitchen">Home & Kitchen</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+          <textarea id="editDesc" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <!-- Optional Image Replacement -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Replace Image <span class="text-slate-400 font-normal">(Optional — replaces old Cloudinary image)</span>
+          </label>
+          <input type="file" id="editImage" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this, 'editImgPreview')" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+          <div class="flex items-center space-x-3 mt-2">
+            <div>
+              <span class="text-[10px] text-slate-400 block mb-0.5">Current:</span>
+              <img id="editCurrentImg" class="w-16 h-16 object-cover rounded border border-slate-200" src="" alt="Current">
+            </div>
+            <div id="editImgPreview" class="hidden">
+              <span class="text-[10px] text-blue-500 font-bold block mb-0.5">New Preview:</span>
+              <img class="w-16 h-16 object-cover rounded border border-blue-300" src="" alt="New">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeEditModal()" class="px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" id="editSubmitBtn" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer shadow-sm">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State
+    let authToken = localStorage.getItem("jwt_token") || "";
+    let currentUser = JSON.parse(localStorage.getItem("user_info") || "null");
+    let currentPage = 1;
+    let searchDebounceTimer = null;
+    let cooldownTimer = null;
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      checkHealth();
+      updateAuthUI();
+      loadProducts(1);
+    });
+
+    // Check System Health & MySQL Connection
+    async function checkHealth() {
+      const pill = document.getElementById("dbStatusPill");
+      const text = document.getElementById("dbStatusText");
+      const banner = document.getElementById("dbAlertBanner");
+      const bTitle = document.getElementById("dbAlertTitle");
+      const bMsg = document.getElementById("dbAlertMsg");
+
+      try {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+
+        if (data.database && data.database.connected) {
+          pill.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200";
+          text.textContent = `MySQL Connected (${data.database.database})`;
+          banner.className = "hidden";
+        } else {
+          pill.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200";
+          text.textContent = "MySQL Waiting for Credentials";
+
+          banner.className = "rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs flex items-start justify-between text-amber-900";
+          document.getElementById("dbAlertIcon").textContent = "⚠️";
+          bTitle.textContent = "MySQL Server Not Yet Connected";
+          bMsg.textContent = "The server is running smoothly! Whenever your MySQL credentials are ready, set DB_HOST, DB_USER, DB_PASSWORD, and DB_NAME in .env, then restart or refresh.";
+        }
+      } catch (err) {
+        pill.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200";
+        text.textContent = "Server Offline";
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tab) {
+      const authSec = document.getElementById("authSection");
+      const prodSec = document.getElementById("productsSection");
+      const docSec = document.getElementById("docsSection");
+
+      const authBtn = document.getElementById("tabAuthBtn");
+      const prodBtn = document.getElementById("tabProductsBtn");
+      const docBtn = document.getElementById("tabDocsBtn");
+
+      // Reset styles
+      [authBtn, prodBtn, docBtn].forEach(b => {
+        b.className = "py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 focus:outline-none cursor-pointer flex items-center gap-2";
+      });
+
+      authSec.classList.add("hidden");
+      prodSec.classList.add("hidden");
+      docSec.classList.add("hidden");
+
+      if (tab === "auth") {
+        authSec.classList.remove("hidden");
+        authBtn.className = "py-3 border-b-2 border-blue-600 text-blue-600 font-semibold focus:outline-none cursor-pointer flex items-center gap-2";
+      } else if (tab === "products") {
+        prodSec.classList.remove("hidden");
+        prodBtn.className = "py-3 border-b-2 border-blue-600 text-blue-600 font-semibold focus:outline-none cursor-pointer flex items-center gap-2";
+        loadProducts(1);
+      } else if (tab === "docs") {
+        docSec.classList.remove("hidden");
+        docBtn.className = "py-3 border-b-2 border-blue-600 text-blue-600 font-semibold focus:outline-none cursor-pointer flex items-center gap-2";
+      }
+    }
+
+    // UI Toast Notification
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("toast");
+      const icon = document.getElementById("toastIcon");
+      const msg = document.getElementById("toastMsg");
+
+      icon.textContent = isError ? "❌" : "✅";
+      msg.textContent = message;
+
+      toast.classList.remove("translate-y-20", "opacity-0", "pointer-events-none");
+      setTimeout(() => {
+        hideToast();
+      }, 4500);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById("toast");
+      toast.classList.add("translate-y-20", "opacity-0", "pointer-events-none");
+    }
+
+    // Log to Dev Console Box
+    function logResponse(title, data) {
+      const consoleBox = document.getElementById("apiConsole");
+      const timestamp = new Date().toLocaleTimeString();
+      const output = `// [${timestamp}] ${title}\n` + JSON.stringify(data, null, 2);
+      consoleBox.textContent = output;
+    }
+
+    function clearResponse() {
+      document.getElementById("apiConsole").textContent = "// Console cleared.";
+    }
+
+    // Update Auth State UI
+    function updateAuthUI() {
+      const userBadge = document.getElementById("userBadge");
+      const guestBadge = document.getElementById("guestBadge");
+      const userNameDisplay = document.getElementById("userNameDisplay");
+      const activeSessionBox = document.getElementById("activeSessionBox");
+      const activeUserEmail = document.getElementById("activeUserEmail");
+      const productAuthNotice = document.getElementById("productAuthNotice");
+
+      if (authToken && currentUser) {
+        userBadge.classList.remove("hidden");
+        userBadge.classList.add("flex");
+        guestBadge.classList.add("hidden");
+        userNameDisplay.textContent = currentUser.name;
+
+        activeSessionBox.classList.remove("hidden");
+        activeUserEmail.textContent = `Logged in as: ${currentUser.email}`;
+        productAuthNotice.classList.add("hidden");
+      } else {
+        userBadge.classList.add("hidden");
+        userBadge.classList.remove("flex");
+        guestBadge.classList.remove("hidden");
+
+        activeSessionBox.classList.add("hidden");
+        productAuthNotice.classList.remove("hidden");
+      }
+    }
+
+    function logout() {
+      authToken = "";
+      currentUser = null;
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("user_info");
+      updateAuthUI();
+      showToast("Logged out successfully.");
+      logResponse("USER LOGGED OUT", { status: "logged_out" });
+    }
+
+    // 1. REGISTER USER
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const btn = document.getElementById("regBtn");
+
+      btn.disabled = true;
+      btn.textContent = "Registering...";
+
+      try {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        logResponse("POST /api/auth/register", data);
+
+        if (res.ok && data.success) {
+          showToast(data.message);
+          // Autofill Verify form
+          document.getElementById("verifyEmail").value = email;
+          document.getElementById("loginEmail").value = email;
+          if (data.data && data.data.debugOtp) {
+            document.getElementById("verifyOtp").value = data.data.debugOtp;
+            showToast(`OTP auto-filled: ${data.data.debugOtp}`);
+          }
+        } else {
+          showToast(data.message || "Registration failed.", true);
+        }
+      } catch (err) {
+        showToast("Network error during registration.", true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Register & Send OTP";
+      }
+    }
+
+    // 2. VERIFY OTP
+    async function handleVerify(e) {
+      e.preventDefault();
+      const email = document.getElementById("verifyEmail").value.trim();
+      const otp = document.getElementById("verifyOtp").value.trim();
+      const btn = document.getElementById("verifyBtn");
+
+      btn.disabled = true;
+      btn.textContent = "Verifying...";
+
+      try {
+        const res = await fetch("/api/auth/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+        logResponse("POST /api/auth/verify-otp", data);
+
+        if (res.ok && data.success) {
+          showToast(data.message);
+          if (data.token && data.user) {
+            authToken = data.token;
+            currentUser = data.user;
+            localStorage.setItem("jwt_token", authToken);
+            localStorage.setItem("user_info", JSON.stringify(currentUser));
+            updateAuthUI();
+          }
+        } else {
+          showToast(data.message || "Verification failed.", true);
+        }
+      } catch (err) {
+        showToast("Network error during OTP verification.", true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Verify Email";
+      }
+    }
+
+    // RESEND OTP
+    async function handleResendOTP() {
+      const email = document.getElementById("verifyEmail").value.trim() || document.getElementById("regEmail").value.trim();
+      if (!email) {
+        showToast("Please enter your email to resend OTP.", true);
+        return;
+      }
+
+      const resendBtn = document.getElementById("resendBtn");
+      const cooldownText = document.getElementById("cooldownText");
+
+      resendBtn.disabled = true;
+      resendBtn.textContent = "Sending...";
+
+      try {
+        const res = await fetch("/api/auth/resend-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        logResponse("POST /api/auth/resend-otp", data);
+
+        if (res.ok && data.success) {
+          showToast(data.message);
+          if (data.data && data.data.debugOtp) {
+            document.getElementById("verifyOtp").value = data.data.debugOtp;
+            showToast(`New OTP: ${data.data.debugOtp}`);
+          }
+          startCooldown(60);
+        } else if (res.status === 429) {
+          showToast(data.message, true);
+        } else {
+          showToast(data.message || "Could not resend OTP.", true);
+        }
+      } catch (err) {
+        showToast("Error requesting new OTP.", true);
+      } finally {
+        if (!cooldownTimer) {
+          resendBtn.disabled = false;
+          resendBtn.textContent = "Resend OTP";
+        }
+      }
+    }
+
+    function startCooldown(seconds) {
+      const resendBtn = document.getElementById("resendBtn");
+      const cooldownText = document.getElementById("cooldownText");
+      let remaining = seconds;
+
+      resendBtn.disabled = true;
+      cooldownText.classList.remove("hidden");
+
+      clearInterval(cooldownTimer);
+      cooldownTimer = setInterval(() => {
+        remaining--;
+        resendBtn.textContent = `Wait ${remaining}s`;
+        cooldownText.textContent = `Cooldown: ${remaining}s before next OTP`;
+
+        if (remaining <= 0) {
+          clearInterval(cooldownTimer);
+          cooldownTimer = null;
+          resendBtn.disabled = false;
+          resendBtn.textContent = "Resend OTP";
+          cooldownText.classList.add("hidden");
+        }
+      }, 1000);
+    }
+
+    // 3. LOGIN USER
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const btn = document.getElementById("loginBtn");
+
+      btn.disabled = true;
+      btn.textContent = "Authenticating...";
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        logResponse("POST /api/auth/login", data);
+
+        if (res.ok && data.success) {
+          showToast("Login successful!");
+          authToken = data.token;
+          currentUser = data.user;
+          localStorage.setItem("jwt_token", authToken);
+          localStorage.setItem("user_info", JSON.stringify(currentUser));
+          updateAuthUI();
+          switchTab("products");
+        } else if (res.status === 403 && data.requiresVerification) {
+          showToast(data.message, true);
+          document.getElementById("verifyEmail").value = email;
+          // Switch focus to verify form
+          document.getElementById("verifyOtp").focus();
+        } else {
+          showToast(data.message || "Invalid credentials.", true);
+        }
+      } catch (err) {
+        showToast("Network error during login.", true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Login with JWT";
+      }
+    }
+
+    // ==========================================
+    // PRODUCTS MANAGEMENT LOGIC
+    // ==========================================
+
+    function handleSearchDebounce() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        loadProducts(1);
+      }, 350);
+    }
+
+    async function loadProducts(page = 1) {
+      currentPage = page;
+      const search = document.getElementById("searchInput").value.trim();
+      const category = document.getElementById("categoryFilter").value;
+      const grid = document.getElementById("productsGrid");
+      const empty = document.getElementById("emptyState");
+
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: 8
+      });
+      if (search) params.append("search", search);
+      if (category) params.append("category", category);
+
+      try {
+        const res = await fetch(`/api/products?${params.toString()}`);
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          renderProducts(result.data);
+          updatePagination(result);
+        } else {
+          grid.innerHTML = "";
+          empty.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Failed to load products:", err);
+      }
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById("productsGrid");
+      const empty = document.getElementById("emptyState");
+
+      if (!products || products.length === 0) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      grid.innerHTML = products.map(product => {
+        const isOwner = currentUser && (currentUser.id === product.createdBy?.id || currentUser.id === product.createdBy);
+        return `
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div class="relative bg-slate-100 aspect-video overflow-hidden">
+              <img src="${product.imageUrl}" alt="${escapeHtml(product.title)}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+              <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                ${escapeHtml(product.category || 'General')}
+              </span>
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="font-bold text-slate-900 text-xs line-clamp-1" title="${escapeHtml(product.title)}">
+                    ${escapeHtml(product.title)}
+                  </h3>
+                  <span class="font-extrabold text-blue-600 text-xs">
+                    $${parseFloat(product.price).toFixed(2)}
+                  </span>
+                </div>
+
+                <p class="text-slate-500 text-[11px] mt-1 line-clamp-2">
+                  ${escapeHtml(product.description || 'No description provided.')}
+                </p>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">Stock: <strong class="text-slate-700">${product.stock}</strong></span>
+
+                <div class="flex items-center space-x-1">
+                  <button onclick='openEditModal(${JSON.stringify(product)})' class="p-1.5 hover:bg-slate-100 text-blue-600 rounded cursor-pointer" title="Edit Product">
+                    ✏️
+                  </button>
+                  <button onclick="handleDeleteProduct(${product.id}, '${escapeHtml(product.title)}')" class="p-1.5 hover:bg-rose-50 text-rose-600 rounded cursor-pointer" title="Delete Product">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function updatePagination(result) {
+      document.getElementById("pageInfo").textContent = `Total: ${result.total} products (Page ${result.page} of ${result.totalPages})`;
+      document.getElementById("currentPageNum").textContent = result.page;
+
+      const prevBtn = document.getElementById("prevPageBtn");
+      const nextBtn = document.getElementById("nextPageBtn");
+
+      prevBtn.disabled = result.page <= 1;
+      nextBtn.disabled = result.page >= result.totalPages;
+    }
+
+    function changePage(delta) {
+      loadProducts(currentPage + delta);
+    }
+
+    // Image Preview Helper with Client-side validation
+    function previewImage(input, previewContainerId) {
+      const container = document.getElementById(previewContainerId);
+      const img = container.querySelector("img");
+
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+
+        // Format validation
+        const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        if (!validTypes.includes(file.type)) {
+          showToast("Invalid image format! Only JPG, JPEG, PNG, WEBP allowed.", true);
+          input.value = "";
+          container.classList.add("hidden");
+          return;
+        }
+
+        // Size limit: 5MB
+        if (file.size > 5 * 1024 * 1024) {
+          showToast("Image exceeds 5MB limit. Please upload a smaller file.", true);
+          input.value = "";
+          container.classList.add("hidden");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target.result;
+          container.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        container.classList.add("hidden");
+      }
+    }
+
+    // CREATE PRODUCT MODAL
+    function openCreateModal() {
+      if (!authToken) {
+        showToast("Please login first to add a product.", true);
+        switchTab("auth");
+        return;
+      }
+      document.getElementById("createProductForm").reset();
+      document.getElementById("createImgPreview").classList.add("hidden");
+      document.getElementById("createModal").classList.remove("hidden");
+    }
+
+    function closeCreateModal() {
+      document.getElementById("createModal").classList.add("hidden");
+    }
+
+    async function handleCreateProduct(e) {
+      e.preventDefault();
+      if (!authToken) {
+        showToast("Authentication required.", true);
+        return;
+      }
+
+      const form = document.getElementById("createProductForm");
+      const submitBtn = document.getElementById("createSubmitBtn");
+      const formData = new FormData();
+
+      formData.append("title", document.getElementById("createTitle").value.trim());
+      formData.append("price", document.getElementById("createPrice").value);
+      formData.append("stock", document.getElementById("createStock").value);
+      formData.append("category", document.getElementById("createCategory").value);
+      formData.append("description", document.getElementById("createDesc").value.trim());
+
+      const fileInput = document.getElementById("createImage");
+      if (fileInput.files[0]) {
+        formData.append("image", fileInput.files[0]);
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Uploading...";
+
+      try {
+        const res = await fetch("/api/products", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${authToken}`
+          },
+          body: formData
+        });
+        const data = await res.json();
+        logResponse("POST /api/products", data);
+
+        if (res.ok && data.success) {
+          showToast("Product created successfully!");
+          closeCreateModal();
+          loadProducts(1);
+        } else {
+          showToast(data.message || "Failed to create product.", true);
+        }
+      } catch (err) {
+        showToast("Network error uploading product.", true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Upload & Save Product";
+      }
+    }
+
+    // EDIT PRODUCT MODAL
+    function openEditModal(product) {
+      if (!authToken) {
+        showToast("Please login first to edit a product.", true);
+        switchTab("auth");
+        return;
+      }
+
+      document.getElementById("editProductId").value = product.id;
+      document.getElementById("editTitle").value = product.title;
+      document.getElementById("editPrice").value = product.price;
+      document.getElementById("editStock").value = product.stock;
+      document.getElementById("editCategory").value = product.category || "General";
+      document.getElementById("editDesc").value = product.description || "";
+
+      document.getElementById("editCurrentImg").src = product.imageUrl;
+      document.getElementById("editImage").value = "";
+      document.getElementById("editImgPreview").classList.add("hidden");
+
+      document.getElementById("editModal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").classList.add("hidden");
+    }
+
+    async function handleUpdateProduct(e) {
+      e.preventDefault();
+      if (!authToken) {
+        showToast("Authentication required.", true);
+        return;
+      }
+
+      const id = document.getElementById("editProductId").value;
+      const submitBtn = document.getElementById("editSubmitBtn");
+      const formData = new FormData();
+
+      formData.append("title", document.getElementById("editTitle").value.trim());
+      formData.append("price", document.getElementById("editPrice").value);
+      formData.append("stock", document.getElementById("editStock").value);
+      formData.append("category", document.getElementById("editCategory").value);
+      formData.append("description", document.getElementById("editDesc").value.trim());
+
+      const fileInput = document.getElementById("editImage");
+      if (fileInput.files[0]) {
+        formData.append("image", fileInput.files[0]);
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Saving...";
+
+      try {
+        const res = await fetch(`/api/products/${id}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${authToken}`
+          },
+          body: formData
+        });
+        const data = await res.json();
+        logResponse(`PUT /api/products/${id}`, data);
+
+        if (res.ok && data.success) {
+          showToast("Product updated successfully!");
+          closeEditModal();
+          loadProducts(currentPage);
+        } else {
+          showToast(data.message || "Failed to update product.", true);
+        }
+      } catch (err) {
+        showToast("Network error updating product.", true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save Changes";
+      }
+    }
+
+    // DELETE PRODUCT
+    async function handleDeleteProduct(id, title) {
+      if (!authToken) {
+        showToast("Please login first to delete products.", true);
+        switchTab("auth");
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to delete product "${title}"?\nThis will remove the product and its Cloudinary image.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/products/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${authToken}`
+          }
+        });
+        const data = await res.json();
+        logResponse(`DELETE /api/products/${id}`, data);
+
+        if (res.ok && data.success) {
+          showToast("Product and Cloudinary image deleted successfully.");
+          loadProducts(currentPage);
+        } else {
+          showToast(data.message || "Failed to delete product.", true);
+        }
+      } catch (err) {
+        showToast("Network error deleting product.", true);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "calculator-api",
+  "version": "1.0.0",
+  "description": "Beginner friendly Calculator REST API with GET endpoints connected to MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "express",
+    "calculator",
+    "api",
+    "beginner",
+    "rest",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}

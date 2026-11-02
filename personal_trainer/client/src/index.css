@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg-primary: #090b0e;
+  --bg-secondary: #0f131a;
+  --bg-card: #141822;
+  --bg-card-hover: #1b212f;
+  
+  --accent-neon: #ccff00; /* High-performance Electric Volt */
+  --accent-neon-glow: rgba(204, 255, 0, 0.32);
+  --accent-cyan: #06b6d4;  /* Crisp Technical Cyan */
+  --accent-amber: #f59e0b; /* Executive Warning/Highlight */
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-neon: rgba(204, 255, 0, 0.35);
+  
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+  
+  --transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(204, 255, 0, 0.035) 0%, transparent 60%),
+    linear-gradient(180deg, #090b0e 0%, #06080a 100%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-font {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+.container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Smooth Dropdown Animation Classes */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+}
+
+.dropdown-active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Mega Menu Smooth Slide Down */
+.megamenu-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, visibility 0.35s;
+}
+
+.megamenu-open {
+  max-height: 520px;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Collection Card Image Hover Effect */
+.collection-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-4px);
+}
+
+.collection-card img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.collection-card:hover img {
+  transform: scale(1.06);
+}
+
+.glow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--accent-neon);
+  color: #000000;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.glow-btn:hover {
+  background: #bfff00;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  transition: var(--transition-fast);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-strong);
+  color: #fff;
+}
+
+.glass-card {
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: #2a2a2a;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: rgba(212, 255, 0, 0.15);
+  color: var(--accent-neon);
+  border: 1px solid rgba(212, 255, 0, 0.3);
+}
+
+.badge-rose {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Square Bottom Toast Notification */
+@keyframes toastSlideUpBottom {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-square-bottom {
+  animation: toastSlideUpBottom 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

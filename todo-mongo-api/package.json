@@ -1,0 +1,17 @@
+{
+  "name": "todo-mongo-api",
+  "version": "1.0.0",
+  "description": "Beginner friendly Todo List REST API connected to MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "keywords": ["express", "mongodb", "mongoose", "todo", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}

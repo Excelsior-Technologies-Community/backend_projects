@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes API Studio - Private Notes & Search</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-amber-50/30 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- TOP NAVIGATION -->
+  <header class="bg-white border-b border-amber-100/80 sticky top-0 z-30 shadow-sm backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-md shadow-amber-200">
+          <i data-lucide="sticky-note" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-tight">Notes API Studio</h1>
+          <div class="flex items-center space-x-2 text-xs text-slate-500">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="statusDot"></span>
+            <span id="apiStatusText">Connected to <code class="text-slate-600 font-mono">http://localhost:5003</code></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auth & Actions Nav -->
+      <div class="flex items-center space-x-3">
+        <!-- Settings -->
+        <button onclick="toggleConfigModal()" title="API Settings" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
+          <i data-lucide="settings-2" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Guest View -->
+        <div id="authGuest" class="flex items-center space-x-2">
+          <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition">
+            Sign In
+          </button>
+          <button onclick="openAuthModal('register')" class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 shadow-sm shadow-amber-200 rounded-lg transition flex items-center space-x-1.5">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Register</span>
+          </button>
+        </div>
+
+        <!-- Authenticated View -->
+        <div id="authUser" class="hidden items-center space-x-3">
+          <button onclick="openCreateNoteModal()" class="px-3.5 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 shadow-sm shadow-amber-200 rounded-lg transition flex items-center space-x-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Add Note</span>
+          </button>
+          
+          <div class="flex items-center pl-2 border-l border-slate-200 space-x-2">
+            <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs" id="userAvatar">
+              U
+            </div>
+            <div class="hidden sm:block text-left text-xs">
+              <p class="font-semibold text-slate-800" id="userName">User</p>
+              <p class="text-slate-500 truncate max-w-[120px]" id="userEmail">user@example.com</p>
+            </div>
+            <button onclick="logoutUser()" title="Logout" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    
+    <!-- HERO / INTRO BANNER -->
+    <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-2xl p-6 sm:p-8 text-white shadow-lg shadow-amber-200/50 mb-8 relative overflow-hidden">
+      <div class="relative z-10 max-w-2xl">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/40 text-amber-100 border border-amber-300/30 mb-3">
+          Private User Notes • Title Search • Date & Category Filters
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Your Personal Workspace</h2>
+        <p class="mt-2 text-amber-100 text-sm sm:text-base leading-relaxed">
+          Create, categorize, search, and manage your private thoughts securely. All notes are protected by JWT authentication and indexed for fast retrieval.
+        </p>
+      </div>
+      <div class="absolute -right-8 -bottom-10 opacity-15 text-white pointer-events-none">
+        <i data-lucide="file-text" class="w-64 h-64"></i>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH PANEL -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm mb-8 space-y-4">
+      
+      <!-- Row 1: Search and Category Pills -->
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <!-- Search Input -->
+        <div class="relative flex-1 w-full">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search notes by title (e.g. Meeting, Project, Ideas)..." 
+            class="block w-full pl-10 pr-20 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+            onkeydown="if(event.key === 'Enter') fetchNotes(1)"
+          >
+          <button 
+            onclick="fetchNotes(1)" 
+            class="absolute inset-y-1.5 right-1.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium text-xs rounded-lg transition"
+          >
+            Search
+          </button>
+        </div>
+
+        <!-- Quick Categories -->
+        <div class="flex items-center space-x-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="categoryPills">
+          <button onclick="setCategoryFilter('')" class="category-btn active px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 text-white shadow-sm transition" data-cat="">
+            All
+          </button>
+          <button onclick="setCategoryFilter('Work')" class="category-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition" data-cat="Work">
+            Work
+          </button>
+          <button onclick="setCategoryFilter('Personal')" class="category-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition" data-cat="Personal">
+            Personal
+          </button>
+          <button onclick="setCategoryFilter('Ideas')" class="category-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition" data-cat="Ideas">
+            Ideas
+          </button>
+          <button onclick="setCategoryFilter('Todo')" class="category-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition" data-cat="Todo">
+            Todo
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 2: Date Filters & Reset Bar -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+        
+        <!-- Date filter toggles -->
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <span class="text-slate-400 font-medium flex items-center space-x-1">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span>Filter Date:</span>
+          </span>
+
+          <input 
+            type="date" 
+            id="filterDate" 
+            title="Single Date" 
+            class="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:ring-1 focus:ring-amber-500"
+            onchange="onDateChanged()"
+          >
+
+          <span class="text-slate-400">or Range:</span>
+
+          <input 
+            type="date" 
+            id="filterStartDate" 
+            placeholder="From" 
+            title="Start Date" 
+            class="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:ring-1 focus:ring-amber-500"
+            onchange="onDateRangeChanged()"
+          >
+          <span class="text-slate-400">to</span>
+          <input 
+            type="date" 
+            id="filterEndDate" 
+            placeholder="To" 
+            title="End Date" 
+            class="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:ring-1 focus:ring-amber-500"
+            onchange="onDateRangeChanged()"
+          >
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <button 
+            onclick="resetFilters()" 
+            class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition flex items-center space-x-1"
+          >
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Reset All</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- NOT AUTHENTICATED CALLOUT -->
+    <div id="unauthAlert" class="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center max-w-xl mx-auto my-12 shadow-sm">
+      <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="lock" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900">Sign in to Access Private Notes</h3>
+      <p class="text-sm text-slate-600 mt-2">
+        In the Notes API, each user's notes are private, isolated, and encrypted under your account. Sign in or register in 5 seconds to manage your notes.
+      </p>
+      <div class="mt-6 flex items-center justify-center space-x-3">
+        <button onclick="openAuthModal('login')" class="px-5 py-2.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-sm transition">
+          Sign In Now
+        </button>
+        <button onclick="openAuthModal('register')" class="px-5 py-2.5 text-sm font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 rounded-xl transition">
+          Create Account
+        </button>
+      </div>
+    </div>
+
+    <!-- NOTES LOADING -->
+    <div id="notesLoading" class="hidden py-16 text-center">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-500 border-t-transparent"></div>
+      <p class="mt-3 text-sm text-slate-500">Loading your notes...</p>
+    </div>
+
+    <!-- NOTES EMPTY -->
+    <div id="notesEmpty" class="hidden bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto my-8">
+      <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="notebook-pen" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-base font-semibold text-slate-900">No notes found</h3>
+      <p class="text-sm text-slate-500 mt-1">
+        No notes matched your filters or you haven't created any yet. Click below to add your first note!
+      </p>
+      <div class="mt-5">
+        <button onclick="openCreateNoteModal()" class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-sm">
+          + Add New Note
+        </button>
+      </div>
+    </div>
+
+    <!-- NOTES GRID -->
+    <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex space-x-4">
+          <button id="authTabLogin" onclick="switchAuthTab('login')" class="text-sm font-bold text-amber-600 border-b-2 border-amber-600 pb-1">
+            Sign In
+          </button>
+          <button id="authTabRegister" onclick="switchAuthTab('register')" class="text-sm font-semibold text-slate-400 hover:text-slate-700 pb-1">
+            Register Account
+          </button>
+        </div>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="p-6 space-y-4">
+        
+        <div id="nameField" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Your Name</label>
+          <input 
+            type="text" 
+            id="authName" 
+            placeholder="John Doe" 
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Email Address</label>
+          <input 
+            type="email" 
+            id="authEmail" 
+            required 
+            placeholder="john@example.com" 
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Password</label>
+          <input 
+            type="password" 
+            id="authPassword" 
+            required 
+            placeholder="••••••••" 
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+          >
+        </div>
+
+        <div id="authError" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg"></div>
+
+        <div class="pt-2">
+          <button 
+            type="submit" 
+            id="authSubmitBtn" 
+            class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-amber-200 transition"
+          >
+            Sign In
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT NOTE MODAL -->
+  <div id="noteModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
+      
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-amber-600"></i>
+          <h3 class="text-base font-bold text-slate-900" id="noteModalTitle">Add New Note</h3>
+        </div>
+        <button onclick="closeNoteModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="noteForm" onsubmit="handleNoteSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="editNoteId" value="">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Title</label>
+          <input 
+            type="text" 
+            id="noteTitle" 
+            required 
+            minlength="2" 
+            maxlength="100"
+            placeholder="e.g. Backend API Architecture Notes" 
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Category</label>
+          <div class="flex items-center space-x-2">
+            <select 
+              id="noteCategorySelect" 
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+              onchange="onCategorySelectChange(this.value)"
+            >
+              <option value="General">General</option>
+              <option value="Work">Work</option>
+              <option value="Personal">Personal</option>
+              <option value="Ideas">Ideas</option>
+              <option value="Todo">Todo</option>
+              <option value="Custom">Custom category...</option>
+            </select>
+          </div>
+          <input 
+            type="text" 
+            id="noteCategoryCustom" 
+            placeholder="Type custom category name..." 
+            class="hidden mt-2 w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Note Content</label>
+          <textarea 
+            id="noteContent" 
+            required 
+            rows="5" 
+            placeholder="Write your note contents here..." 
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white"
+          ></textarea>
+        </div>
+
+        <div id="noteModalError" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg"></div>
+
+        <div class="flex items-center justify-end space-x-3 pt-2">
+          <button 
+            type="button" 
+            onclick="closeNoteModal()" 
+            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            id="noteSubmitBtn" 
+            class="px-5 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-sm"
+          >
+            Save Note
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIG MODAL -->
+  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900">API Server URL</h3>
+        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 mb-3">
+        Specify the port or domain where your <code>notes-api</code> Express server is currently running:
+      </p>
+      <input 
+        type="text" 
+        id="apiBaseInput" 
+        class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 mb-4 font-mono"
+      >
+      <button 
+        onclick="saveApiBaseConfig()" 
+        class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm rounded-lg"
+      >
+        Save & Reconnect
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- JAVASCRIPT CLIENT LOGIC -->
+  <script>
+    let API_BASE = localStorage.getItem("notes_api_base") || (window.location.port === "5003" ? "" : "http://localhost:5003");
+    let authToken = localStorage.getItem("notes_jwt_token") || null;
+    let currentUser = JSON.parse(localStorage.getItem("notes_current_user") || "null");
+    let activeCategory = "";
+    let currentAuthMode = "login";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("apiBaseInput").value = API_BASE || "http://localhost:5003";
+      updateAuthUI();
+      checkServerHealth();
+      if (authToken) {
+        fetchNotes();
+      }
+      lucide.createIcons();
+    });
+
+    async function checkServerHealth() {
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("apiStatusText");
+      try {
+        const res = await fetch(`${API_BASE}/`, { method: "GET" });
+        if (res.ok) {
+          statusDot.className = "inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+          statusText.innerHTML = `Connected to <code class="text-slate-600 font-mono">${API_BASE || "Origin"}</code>`;
+        } else {
+          throw new Error("Bad status");
+        }
+      } catch (err) {
+        statusDot.className = "inline-block w-2 h-2 rounded-full bg-amber-500";
+        statusText.innerHTML = `Offline / Waiting for server on <code class="text-slate-600 font-mono">${API_BASE || "5003"}</code>`;
+      }
+    }
+
+    function updateAuthUI() {
+      const guestDiv = document.getElementById("authGuest");
+      const userDiv = document.getElementById("authUser");
+      const unauthAlert = document.getElementById("unauthAlert");
+
+      if (authToken && currentUser) {
+        guestDiv.classList.add("hidden");
+        userDiv.classList.remove("hidden");
+        userDiv.classList.add("flex");
+        unauthAlert.classList.add("hidden");
+        document.getElementById("userName").textContent = currentUser.name || "User";
+        document.getElementById("userEmail").textContent = currentUser.email || "";
+        document.getElementById("userAvatar").textContent = (currentUser.name ? currentUser.name[0] : "U").toUpperCase();
+      } else {
+        guestDiv.classList.remove("hidden");
+        userDiv.classList.add("hidden");
+        userDiv.classList.remove("flex");
+        unauthAlert.classList.remove("hidden");
+        document.getElementById("notesGrid").innerHTML = "";
+        document.getElementById("notesEmpty").classList.add("hidden");
+      }
+      lucide.createIcons();
+    }
+
+    // Auth Modal handling
+    function openAuthModal(mode) {
+      currentAuthMode = mode;
+      switchAuthTab(mode);
+      document.getElementById("authError").classList.add("hidden");
+      document.getElementById("authModal").classList.remove("hidden");
+    }
+
+    function closeAuthModal() {
+      document.getElementById("authModal").classList.add("hidden");
+    }
+
+    function switchAuthTab(mode) {
+      currentAuthMode = mode;
+      const loginTab = document.getElementById("authTabLogin");
+      const regTab = document.getElementById("authTabRegister");
+      const nameField = document.getElementById("nameField");
+      const submitBtn = document.getElementById("authSubmitBtn");
+
+      if (mode === "login") {
+        loginTab.className = "text-sm font-bold text-amber-600 border-b-2 border-amber-600 pb-1";
+        regTab.className = "text-sm font-semibold text-slate-400 hover:text-slate-700 pb-1";
+        nameField.classList.add("hidden");
+        submitBtn.textContent = "Sign In";
+      } else {
+        regTab.className = "text-sm font-bold text-amber-600 border-b-2 border-amber-600 pb-1";
+        loginTab.className = "text-sm font-semibold text-slate-400 hover:text-slate-700 pb-1";
+        nameField.classList.remove("hidden");
+        submitBtn.textContent = "Create Account";
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const errBox = document.getElementById("authError");
+      errBox.classList.add("hidden");
+
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      const name = document.getElementById("authName").value.trim();
+
+      const endpoint = currentAuthMode === "register" ? "/api/auth/register" : "/api/auth/login";
+      const payload = currentAuthMode === "register" ? { name, email, password } : { email, password };
+
+      try {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Authentication failed.");
+        }
+
+        authToken = data.token;
+        currentUser = data.user;
+        localStorage.setItem("notes_jwt_token", authToken);
+        localStorage.setItem("notes_current_user", JSON.stringify(currentUser));
+
+        closeAuthModal();
+        updateAuthUI();
+        showToast(currentAuthMode === "register" ? "Account created successfully!" : `Welcome, ${currentUser.name}!`, "success");
+        fetchNotes();
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.classList.remove("hidden");
+      }
+    }
+
+    function logoutUser() {
+      authToken = null;
+      currentUser = null;
+      localStorage.removeItem("notes_jwt_token");
+      localStorage.removeItem("notes_current_user");
+      updateAuthUI();
+      showToast("Signed out successfully.", "info");
+    }
+
+    // Fetch Notes with Query Parameters
+    async function fetchNotes() {
+      if (!authToken) return;
+
+      const loading = document.getElementById("notesLoading");
+      const empty = document.getElementById("notesEmpty");
+      const grid = document.getElementById("notesGrid");
+
+      loading.classList.remove("hidden");
+      empty.classList.add("hidden");
+      grid.innerHTML = "";
+
+      const searchVal = document.getElementById("searchInput").value.trim();
+      const singleDate = document.getElementById("filterDate").value;
+      const startDate = document.getElementById("filterStartDate").value;
+      const endDate = document.getElementById("filterEndDate").value;
+
+      let queryParams = new URLSearchParams();
+      if (searchVal) queryParams.set("search", searchVal);
+      if (activeCategory) queryParams.set("category", activeCategory);
+      if (singleDate) {
+        queryParams.set("date", singleDate);
+      } else if (startDate && endDate) {
+        queryParams.set("startDate", startDate);
+        queryParams.set("endDate", endDate);
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/notes?${queryParams.toString()}`, {
+          headers: { "Authorization": `Bearer ${authToken}` }
+        });
+        const result = await res.json();
+
+        loading.classList.add("hidden");
+
+        if (!res.ok) {
+          throw new Error(result.message || "Failed to load notes.");
+        }
+
+        const notes = result.data || [];
+        if (notes.length === 0) {
+          empty.classList.remove("hidden");
+          return;
+        }
+
+        grid.innerHTML = notes.map(note => renderNoteCard(note)).join("");
+        lucide.createIcons();
+      } catch (err) {
+        loading.classList.add("hidden");
+        grid.innerHTML = `
+          <div class="col-span-full bg-rose-50 border border-rose-200 text-rose-700 p-6 rounded-xl text-center">
+            <p class="font-semibold">Unable to fetch notes</p>
+            <p class="text-xs text-rose-500 mt-1">${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderNoteCard(note) {
+      const category = note.category || "General";
+      const badgeStyle = getCategoryBadgeStyle(category);
+
+      const createdDate = new Date(note.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      const createdTime = new Date(note.createdAt).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/80 hover:border-amber-300 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+          <div>
+            <!-- Header: Category & Actions -->
+            <div class="flex items-center justify-between mb-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeStyle}">
+                ${escapeHtml(category)}
+              </span>
+
+              <div class="flex items-center space-x-1">
+                <button onclick="openEditNoteModal('${note._id}', '${escapeQuote(note.title)}', '${escapeQuote(category)}', '${escapeQuote(note.content)}')" class="p-1 hover:text-amber-600 hover:bg-amber-50 rounded" title="Edit Note">
+                  <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteNote('${note._id}')" class="p-1 hover:text-rose-600 hover:bg-rose-50 rounded" title="Delete Note">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-base font-bold text-slate-900 group-hover:text-amber-700 transition">
+              ${escapeHtml(note.title)}
+            </h3>
+
+            <!-- Content -->
+            <p class="mt-2 text-sm text-slate-600 whitespace-pre-line leading-relaxed line-clamp-6">
+              ${escapeHtml(note.content)}
+            </p>
+          </div>
+
+          <!-- Footer Timestamp -->
+          <div class="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span class="flex items-center space-x-1">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              <span>${createdDate} • ${createdTime}</span>
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function getCategoryBadgeStyle(cat) {
+      switch ((cat || "").toLowerCase()) {
+        case "work":
+          return "bg-blue-50 text-blue-700 border border-blue-200";
+        case "personal":
+          return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        case "ideas":
+          return "bg-purple-50 text-purple-700 border border-purple-200";
+        case "todo":
+          return "bg-amber-50 text-amber-700 border border-amber-200";
+        default:
+          return "bg-slate-100 text-slate-700 border border-slate-200";
+      }
+    }
+
+    // Filter events
+    function setCategoryFilter(cat) {
+      activeCategory = cat;
+      document.querySelectorAll(".category-btn").forEach(btn => {
+        if (btn.getAttribute("data-cat") === cat) {
+          btn.className = "category-btn active px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 text-white shadow-sm transition";
+        } else {
+          btn.className = "category-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
+        }
+      });
+      fetchNotes();
+    }
+
+    function onDateChanged() {
+      document.getElementById("filterStartDate").value = "";
+      document.getElementById("filterEndDate").value = "";
+      fetchNotes();
+    }
+
+    function onDateRangeChanged() {
+      const s = document.getElementById("filterStartDate").value;
+      const e = document.getElementById("filterEndDate").value;
+      if (s && e) {
+        document.getElementById("filterDate").value = "";
+        fetchNotes();
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("filterDate").value = "";
+      document.getElementById("filterStartDate").value = "";
+      document.getElementById("filterEndDate").value = "";
+      setCategoryFilter("");
+    }
+
+    // Note Modals
+    function openCreateNoteModal() {
+      if (!authToken) {
+        openAuthModal("login");
+        return;
+      }
+      document.getElementById("noteModalTitle").textContent = "Add New Note";
+      document.getElementById("editNoteId").value = "";
+      document.getElementById("noteTitle").value = "";
+      document.getElementById("noteContent").value = "";
+      document.getElementById("noteCategorySelect").value = "General";
+      document.getElementById("noteCategoryCustom").value = "";
+      document.getElementById("noteCategoryCustom").classList.add("hidden");
+      document.getElementById("noteSubmitBtn").textContent = "Save Note";
+      document.getElementById("noteModalError").classList.add("hidden");
+      document.getElementById("noteModal").classList.remove("hidden");
+    }
+
+    function openEditNoteModal(id, title, category, content) {
+      document.getElementById("noteModalTitle").textContent = "Edit Note";
+      document.getElementById("editNoteId").value = id;
+      document.getElementById("noteTitle").value = unescapeQuote(title);
+      document.getElementById("noteContent").value = unescapeQuote(content);
+      
+      const unescapedCat = unescapeQuote(category);
+      const sel = document.getElementById("noteCategorySelect");
+      if (["General", "Work", "Personal", "Ideas", "Todo"].includes(unescapedCat)) {
+        sel.value = unescapedCat;
+        document.getElementById("noteCategoryCustom").classList.add("hidden");
+      } else {
+        sel.value = "Custom";
+        document.getElementById("noteCategoryCustom").classList.remove("hidden");
+        document.getElementById("noteCategoryCustom").value = unescapedCat;
+      }
+
+      document.getElementById("noteSubmitBtn").textContent = "Update Note";
+      document.getElementById("noteModalError").classList.add("hidden");
+      document.getElementById("noteModal").classList.remove("hidden");
+    }
+
+    function closeNoteModal() {
+      document.getElementById("noteModal").classList.add("hidden");
+    }
+
+    function onCategorySelectChange(val) {
+      const customInput = document.getElementById("noteCategoryCustom");
+      if (val === "Custom") {
+        customInput.classList.remove("hidden");
+        customInput.focus();
+      } else {
+        customInput.classList.add("hidden");
+      }
+    }
+
+    async function handleNoteSubmit(e) {
+      e.preventDefault();
+      const errBox = document.getElementById("noteModalError");
+      errBox.classList.add("hidden");
+
+      const editId = document.getElementById("editNoteId").value;
+      const title = document.getElementById("noteTitle").value.trim();
+      const content = document.getElementById("noteContent").value.trim();
+      
+      let category = document.getElementById("noteCategorySelect").value;
+      if (category === "Custom") {
+        category = document.getElementById("noteCategoryCustom").value.trim() || "General";
+      }
+
+      const isEdit = Boolean(editId);
+      const url = isEdit ? `${API_BASE}/api/notes/${editId}` : `${API_BASE}/api/notes`;
+      const method = isEdit ? "PUT" : "POST";
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ title, content, category })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to save note.");
+        }
+
+        closeNoteModal();
+        showToast(isEdit ? "Note updated!" : "Note created!", "success");
+        fetchNotes();
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.classList.remove("hidden");
+      }
+    }
+
+    async function deleteNote(id) {
+      if (!confirm("Are you sure you want to delete this note?")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/notes/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to delete note.");
+        }
+
+        showToast("Note deleted.", "success");
+        fetchNotes();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    // Config modal
+    function toggleConfigModal() {
+      document.getElementById("configModal").classList.toggle("hidden");
+    }
+
+    function saveApiBaseConfig() {
+      const val = document.getElementById("apiBaseInput").value.trim().replace(/\/$/, "");
+      API_BASE = val;
+      localStorage.setItem("notes_api_base", val);
+      toggleConfigModal();
+      checkServerHealth();
+      fetchNotes();
+      showToast("Notes API Base URL updated", "info");
+    }
+
+    // Toast
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+
+      const colors = {
+        success: "bg-emerald-600 text-white shadow-emerald-200",
+        error: "bg-rose-600 text-white shadow-rose-200",
+        info: "bg-slate-800 text-white shadow-slate-300"
+      };
+
+      toast.className = `${colors[type] || colors.info} pointer-events-auto px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 flex items-center space-x-2`;
+      toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeQuote(str) {
+      if (!str) return "";
+      return encodeURIComponent(String(str));
+    }
+    function unescapeQuote(str) {
+      if (!str) return "";
+      return decodeURIComponent(String(str));
+    }
+  </script>
+</body>
+</html>

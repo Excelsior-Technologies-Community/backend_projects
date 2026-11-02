@@ -1,0 +1,632 @@
+{
+  "users": [
+    {
+      "id": "usr-d9a72263",
+      "name": "qwer",
+      "email": "qwer@gmail.com",
+      "passwordHash": "$2b$10$Sj62FKz45wAKZK4zwdK/6.FDWCUvgrPN8O026Md/Etf1MuGkJsePK",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=qwer",
+      "phone": "",
+      "fitnessGoal": "General Fitness & Muscle Tone",
+      "membershipPlanId": null,
+      "membershipStatus": "inactive",
+      "status": "active",
+      "createdAt": "2026-10-05T10:30:52.904Z"
+    },
+    {
+      "id": "usr-895f809b",
+      "name": "abcde",
+      "email": "abcde@gmail.com",
+      "passwordHash": "$2b$10$vepTjUa8iOaDpL9JdOCVG.H9/QUXFvFEHGMEPhdoZsESK1i1O1dFW",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=abcde",
+      "phone": "",
+      "fitnessGoal": "General Fitness & Muscle Tone",
+      "membershipPlanId": null,
+      "membershipStatus": "inactive",
+      "status": "active",
+      "createdAt": "2026-10-05T10:20:56.609Z"
+    },
+    {
+      "id": "usr-38ed91f3",
+      "name": "paa",
+      "email": "priyankjadav8@gmail.com",
+      "passwordHash": "$2b$10$rpCy6JdQqc//DQyclewam.A0cwgCOQGZdG0Vevi4rsxMkR8DHznuO",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=paa",
+      "phone": "",
+      "fitnessGoal": "General Fitness & Muscle Tone",
+      "membershipPlanId": null,
+      "membershipStatus": "inactive",
+      "status": "active",
+      "createdAt": "2026-10-01T11:11:48.889Z"
+    },
+    {
+      "id": "usr-04df8e4a",
+      "name": "abc ",
+      "email": "abc@gmail.com",
+      "passwordHash": "$2b$10$ggPXl4LvhJsmvmFoPuM8LO.7PPepg.vn1nWO/AvhjqELwFJJuQAyK",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=abc%20",
+      "phone": "",
+      "fitnessGoal": "General Fitness & Muscle Tone",
+      "membershipPlanId": null,
+      "membershipStatus": "inactive",
+      "status": "active",
+      "createdAt": "2026-09-30T05:22:00.908Z"
+    },
+    {
+      "id": "usr-admin-1",
+      "name": "Head Coach Marcus",
+      "email": "admin@trainer.com",
+      "passwordHash": "$2b$10$mSBEbZrZmMd7TCAJYRvFE.lYXmaEoyItr6cvjpnb2XGt79GDJVBKa",
+      "role": "admin",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "phone": "+1 (555) 234-5678",
+      "membershipPlanId": "plan-3553dacb",
+      "membershipStatus": "active",
+      "status": "active",
+      "createdAt": "2026-01-10T10:00:00.000Z",
+      "updatedAt": "2026-10-05T10:53:28.911Z"
+    },
+    {
+      "id": "usr-customer-1",
+      "name": "user",
+      "email": "user@trainer.com",
+      "passwordHash": "$2b$10$O5QP/a25hoJ.DuVYEXfxX.pi0K4SZrme54vW5dNg6FNLoIemrWp.G",
+      "role": "user",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "phone": "+1 (555) 987-6543",
+      "fitnessGoal": "Hypertrophy & Strength",
+      "membershipPlanId": "plan-2",
+      "membershipStatus": "active",
+      "status": "active",
+      "createdAt": "2026-02-15T14:30:00.000Z",
+      "updatedAt": "2026-10-05T10:19:12.273Z"
+    },
+    {
+      "id": "usr-customer-2",
+      "name": "Sarah Connor",
+      "email": "sarah@fitness.com",
+      "passwordHash": "$2b$10$kgps8yUNpYndvnuox5hA5.3C1xO.2.z7OZ1YTea/qeCYUOxBQJb2y",
+      "role": "user",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+      "phone": "+1 (555) 456-7890",
+      "fitnessGoal": "Fat Loss & Endurance",
+      "membershipPlanId": null,
+      "membershipStatus": "inactive",
+      "status": "active",
+      "createdAt": "2026-03-01T09:15:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-6a87c4d4",
+      "name": "abc",
+      "slug": "abc",
+      "description": "",
+      "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 0,
+      "featured": true,
+      "createdAt": "2026-10-05T10:28:46.199Z"
+    },
+    {
+      "id": "cat-1",
+      "name": "Workout Equipment",
+      "slug": "workout-equipment",
+      "description": "Heavy duty dumbbells, barbells, power racks, and resistance bands.",
+      "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 14,
+      "featured": true
+    },
+    {
+      "id": "cat-2",
+      "name": "Supplements & Nutrition",
+      "slug": "supplements-nutrition",
+      "description": "Premium whey protein isolates, creatine monohydrate, BCAAs, and multivitamins.",
+      "image": "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 18,
+      "featured": true
+    },
+    {
+      "id": "cat-3",
+      "name": "Gym Apparel & Gear",
+      "slug": "gym-apparel",
+      "description": "Sweat-wicking compression tees, lifting straps, power belts, and shoes.",
+      "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 22,
+      "featured": true
+    },
+    {
+      "id": "cat-4",
+      "name": "Training Programs",
+      "slug": "training-programs",
+      "description": "Custom 12-week hypertrophy, fat burner, and powerlifting workout regimes.",
+      "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 8,
+      "featured": true
+    },
+    {
+      "id": "cat-5",
+      "name": "Accessories & Recovery",
+      "slug": "accessories-recovery",
+      "description": "Foam rollers, massage guns, shakers, and smart fitness trackers.",
+      "image": "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=800&q=80",
+      "itemCount": 11,
+      "featured": false
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-8ab00558",
+      "name": "abcdef",
+      "slug": "param",
+      "categoryId": "cat-2",
+      "categoryName": "Supplements & Nutrition",
+      "price": 49.99,
+      "comparePrice": 65,
+      "stock": 1,
+      "sku": "GEAR-1223",
+      "rating": 5,
+      "reviewsCount": 0,
+      "badge": "New Arrival",
+      "images": [
+        "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80"
+      ],
+      "description": "Engineered for high intensity athletic performance ....",
+      "specifications": {},
+      "featured": false,
+      "createdAt": "2026-10-01T11:19:33.382Z",
+      "updatedAt": "2026-10-05T10:28:26.843Z"
+    },
+    {
+      "id": "prod-1",
+      "name": "Pro Hex Cast Iron Dumbbell Set (5kg - 30kg)",
+      "slug": "pro-hex-dumbbell-set",
+      "categoryId": "cat-1",
+      "categoryName": "Workout Equipment",
+      "price": 249.99,
+      "comparePrice": 299.99,
+      "stock": 35,
+      "sku": "HEX-DB-SET",
+      "rating": 4.9,
+      "reviewsCount": 48,
+      "badge": "Bestseller",
+      "images": [
+        "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "Heavy duty rubber encased hex dumbbells engineered for commercial gym toughness and home workout precision. Ergonomic chrome knurled handles prevent slippage during intense sets.",
+      "specifications": {
+        "Material": "Solid Cast Iron + Virgin Rubber",
+        "Handle": "Ergonomic Chrome Knurling",
+        "Weight Range": "5kg to 30kg pairs",
+        "Warranty": "2 Years"
+      },
+      "featured": true,
+      "createdAt": "2026-02-01T10:00:00.000Z"
+    },
+    {
+      "id": "prod-2",
+      "name": "Pure Ultra-Filtered Whey Protein Isolate (2kg)",
+      "slug": "ultra-whey-isolate-2kg",
+      "categoryId": "cat-2",
+      "categoryName": "Supplements & Nutrition",
+      "price": 64.99,
+      "comparePrice": 79.99,
+      "stock": 80,
+      "sku": "WHEY-ISO-VAN",
+      "rating": 4.8,
+      "reviewsCount": 112,
+      "badge": "Top Rated",
+      "images": [
+        "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "27g of pure micro-filtered whey protein isolate per scoop, with 0g added sugar and 6.2g BCAAs for lightning-fast recovery and clean muscle hypertrophy.",
+      "specifications": {
+        "Protein Per Serving": "27 Grams",
+        "Flavor": "Gourmet French Vanilla",
+        "Servings": "66 Servings",
+        "BCAA": "6.2g naturally occurring"
+      },
+      "featured": true,
+      "createdAt": "2026-02-05T10:00:00.000Z"
+    },
+    {
+      "id": "prod-3",
+      "name": "Olympic Power Barbell (20kg / 7ft / 700lb Cap)",
+      "slug": "olympic-power-barbell",
+      "categoryId": "cat-1",
+      "categoryName": "Workout Equipment",
+      "price": 189,
+      "comparePrice": 220,
+      "stock": 22,
+      "sku": "OLY-BAR-20K",
+      "rating": 5,
+      "reviewsCount": 39,
+      "badge": "Hot",
+      "images": [
+        "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "Precision engineered 28mm shaft with dual knurl marks for Olympic lifting and powerlifting. 4 needle bearings per sleeve for buttery smooth spin.",
+      "specifications": {
+        "Bar Weight": "20 kg (44 lbs)",
+        "Shaft Diameter": "28 mm",
+        "Max Capacity": "700 lbs",
+        "Coating": "Black Zinc Shaft / Hard Chrome Sleeves"
+      },
+      "featured": true,
+      "createdAt": "2026-02-08T10:00:00.000Z"
+    },
+    {
+      "id": "prod-4",
+      "name": "12-Week Shred & Athletic Transformation Program",
+      "slug": "12-week-shred-transformation",
+      "categoryId": "cat-4",
+      "categoryName": "Training Programs",
+      "price": 49.99,
+      "comparePrice": 99.99,
+      "stock": 998,
+      "sku": "PROG-12W-SHRED",
+      "rating": 4.95,
+      "reviewsCount": 204,
+      "badge": "Digital Plan",
+      "images": [
+        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "The proven personal trainer program that transformed over 3,000+ athletes. Includes structured split routines, custom macro calculator, video exercise library, and weekly check-in protocols.",
+      "specifications": {
+        "Format": "Digital Video & Interactive PDF App",
+        "Duration": "12 Weeks (3 Phased Blocks)",
+        "Level": "Beginner to Advanced",
+        "Access": "Lifetime"
+      },
+      "featured": true,
+      "createdAt": "2026-02-12T10:00:00.000Z",
+      "updatedAt": "2026-09-30T05:23:33.673Z"
+    },
+    {
+      "id": "prod-5",
+      "name": "High Performance Seamless Compression Shirt",
+      "slug": "seamless-compression-shirt",
+      "categoryId": "cat-3",
+      "categoryName": "Gym Apparel & Gear",
+      "price": 34.99,
+      "comparePrice": 45,
+      "stock": 64,
+      "sku": "APP-COMP-TEE",
+      "rating": 4.7,
+      "reviewsCount": 56,
+      "badge": "Trending",
+      "images": [
+        "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1521804906057-1df8fdb718b7?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "Second-skin athletic fit designed for maximum range of motion, muscle thermoregulation, and ultra quick-drying moisture management.",
+      "specifications": {
+        "Material": "85% Spandex, 15% Elastane",
+        "Sizes": "S, M, L, XL, XXL",
+        "Color": "Carbon Shadow"
+      },
+      "featured": true,
+      "createdAt": "2026-02-14T10:00:00.000Z",
+      "updatedAt": "2026-09-30T05:20:22.287Z"
+    },
+    {
+      "id": "prod-6",
+      "name": "Pre-Workout Explosive Energy & Pump Matrix (400g)",
+      "slug": "preworkout-explosive-pump",
+      "categoryId": "cat-2",
+      "categoryName": "Supplements & Nutrition",
+      "price": 44.5,
+      "comparePrice": 55,
+      "stock": 45,
+      "sku": "SUP-PRE-PUMP",
+      "rating": 4.85,
+      "reviewsCount": 88,
+      "badge": "Top Energy",
+      "images": [
+        "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=900&q=80"
+      ],
+      "description": "Loaded with 6g L-Citrulline, 3.2g Beta-Alanine, and 300mg natural caffeine anhydrous for intense laser focus, vascular pumps, and zero crash.",
+      "specifications": {
+        "Serving Size": "1 Scoop (14g)",
+        "Caffeine": "300mg",
+        "L-Citrulline": "6000mg",
+        "Flavors": "Blue Raspberry Ice"
+      },
+      "featured": false,
+      "createdAt": "2026-02-18T10:00:00.000Z"
+    },
+    {
+      "id": "prod-7",
+      "name": "Heavy Duty 10mm Leather Powerlifting Belt",
+      "slug": "leather-powerlifting-belt",
+      "categoryId": "cat-3",
+      "categoryName": "Gym Apparel & Gear",
+      "price": 89.99,
+      "comparePrice": 110,
+      "stock": 27,
+      "sku": "GEAR-BELT-10MM",
+      "rating": 4.9,
+      "reviewsCount": 72,
+      "badge": "Pro Choice",
+      "images": [
+        "https://personaltrainer-workdo.myshopify.com/cdn/shop/files/blog-img-1.png?v=1684919179"
+      ],
+      "description": "Handcrafted genuine top-grain leather with industrial stainless steel quick-release lever buckle. Certified for competitive powerlifting meets.",
+      "specifications": {
+        "Thickness": "10 mm",
+        "Buckle": "Zinc-alloy Quick Lever",
+        "Width": "4 inches consistent"
+      },
+      "featured": false,
+      "createdAt": "2026-02-22T10:00:00.000Z",
+      "updatedAt": "2026-10-01T11:13:52.911Z"
+    }
+  ],
+  "membershipPlans": [
+    {
+      "id": "plan-3553dacb",
+      "name": "qwe",
+      "tagline": "",
+      "price": 49.99,
+      "billingCycle": "monthly",
+      "popular": false,
+      "badge": "",
+      "features": [
+        "Exclusive 15% Store Discount",
+        "Weekly Workout Splits",
+        "WhatsApp Support"
+      ],
+      "color": "#a3e635",
+      "createdAt": "2026-10-05T10:28:58.532Z"
+    },
+    {
+      "id": "plan-1",
+      "name": "Starter Fitness Pass",
+      "tagline": "Ideal for beginners building gym discipline",
+      "price": 29.99,
+      "billingCycle": "monthly",
+      "popular": false,
+      "badge": "Beginner",
+      "features": [
+        "Full Access to Gym Equipment Store Discounts (5%)",
+        "Standard 3-Day Split Workout Regimes",
+        "Mobile App Workout Tracker & Log",
+        "Community Forum & Fitness Group Access",
+        "Email Support within 48h"
+      ],
+      "color": "#38bdf8"
+    },
+    {
+      "id": "plan-3",
+      "name": "Elite 1-on-1 VIP Coaching",
+      "tagline": "Direct private coaching with Head Coach Marcus",
+      "price": 199.99,
+      "billingCycle": "monthly",
+      "popular": false,
+      "badge": "Exclusive VIP",
+      "features": [
+        "1-on-1 Weekly 45min Video Strategy Call with Marcus",
+        "Hyper-personalized Periodized Workout & Diet Architecture",
+        "Unlimited Direct 24/7 Messaging & Instant Form Feedback",
+        "25% Lifetime Storewide Discount on all products",
+        "Quarterly Supplement & Care Package shipped to your door",
+        "VIP Access to In-Person Annual Fitness Camps"
+      ],
+      "color": "#f59e0b"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ORD-2026-7453",
+      "userId": "usr-customer-1",
+      "customerName": "user",
+      "customerEmail": "user@trainer.com",
+      "shippingAddress": {
+        "fullName": "user",
+        "email": "user@trainer.com",
+        "address": "452 Gym Avenue, Suite 100",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "United States"
+      },
+      "items": [
+        {
+          "productId": "bs-2",
+          "id": "bs-2",
+          "name": "Best Elliptical Cross...",
+          "price": 3000,
+          "formattedPrice": "Rs. 3,000 INR",
+          "image": "/src/assets/in2.webp",
+          "images": [
+            "/src/assets/in2.webp"
+          ],
+          "categoryName": "Aerofit",
+          "quantity": 1
+        }
+      ],
+      "subtotal": 3000,
+      "discount": 0,
+      "tax": 240,
+      "total": 3240,
+      "paymentMethod": "Credit Card",
+      "paymentStatus": "Paid",
+      "orderStatus": "Processing",
+      "trackingNumber": "TRK-8956964US",
+      "createdAt": "2026-10-05T10:27:06.715Z"
+    },
+    {
+      "id": "ORD-2026-5130",
+      "userId": "usr-04df8e4a",
+      "customerName": "abc ",
+      "customerEmail": "abc@gmail.com",
+      "shippingAddress": {
+        "fullName": "abc ",
+        "email": "abc@gmail.com",
+        "address": "452 Gym Avenue, Suite 100",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "United States"
+      },
+      "items": [
+        {
+          "productId": "prod-4",
+          "name": "12-Week Shred & Athletic Transformation Program",
+          "price": 49.99,
+          "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80",
+          "categoryName": "Training Programs",
+          "quantity": 1
+        }
+      ],
+      "subtotal": 49.99,
+      "discount": 0,
+      "tax": 4,
+      "total": 53.99,
+      "paymentMethod": "Credit Card",
+      "paymentStatus": "Paid",
+      "orderStatus": "Processing",
+      "trackingNumber": "TRK-8929432US",
+      "createdAt": "2026-09-30T05:23:33.666Z"
+    },
+    {
+      "id": "ORD-2026-9262",
+      "userId": "usr-admin-1",
+      "customerName": "Head Coach Marcus",
+      "customerEmail": "admin@trainer.com",
+      "shippingAddress": {
+        "fullName": "Head Coach Marcus",
+        "email": "admin@trainer.com",
+        "address": "452 Gym Avenue, Suite 100",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "United States"
+      },
+      "items": [
+        {
+          "productId": "prod-5",
+          "name": "High Performance Seamless Compression Shirt",
+          "price": 34.99,
+          "image": "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=900&q=80",
+          "categoryName": "Gym Apparel & Gear",
+          "quantity": 1
+        }
+      ],
+      "subtotal": 34.99,
+      "discount": 0,
+      "tax": 2.8,
+      "total": 37.79,
+      "paymentMethod": "Credit Card",
+      "paymentStatus": "Paid",
+      "orderStatus": "Processing",
+      "trackingNumber": "TRK-4322241US",
+      "createdAt": "2026-09-30T05:20:22.280Z"
+    },
+    {
+      "id": "ORD-2026-8941",
+      "userId": "usr-customer-1",
+      "customerName": "Alex Johnson",
+      "customerEmail": "user@trainer.com",
+      "shippingAddress": {
+        "address": "742 Evergreen Terrace",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "United States"
+      },
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "Pro Hex Cast Iron Dumbbell Set (5kg - 30kg)",
+          "price": 249.99,
+          "quantity": 1,
+          "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"
+        },
+        {
+          "productId": "prod-2",
+          "name": "Pure Ultra-Filtered Whey Protein Isolate (2kg)",
+          "price": 64.99,
+          "quantity": 2,
+          "image": "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=900&q=80"
+        }
+      ],
+      "subtotal": 379.97,
+      "discount": 20,
+      "tax": 28.8,
+      "total": 388.77,
+      "paymentMethod": "Credit Card",
+      "paymentStatus": "Paid",
+      "orderStatus": "Processing",
+      "trackingNumber": "TRK-8823910US",
+      "createdAt": "2026-03-20T11:45:00.000Z"
+    },
+    {
+      "id": "ORD-2026-7822",
+      "userId": "usr-customer-2",
+      "customerName": "Sarah Connor",
+      "customerEmail": "sarah@fitness.com",
+      "shippingAddress": {
+        "address": "10880 Wilshire Blvd",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90024",
+        "country": "United States"
+      },
+      "items": [
+        {
+          "productId": "prod-4",
+          "name": "12-Week Shred & Athletic Transformation Program",
+          "price": 49.99,
+          "quantity": 1,
+          "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80"
+        }
+      ],
+      "subtotal": 49.99,
+      "discount": 0,
+      "tax": 4,
+      "total": 53.99,
+      "paymentMethod": "PayPal",
+      "paymentStatus": "Paid",
+      "orderStatus": "Delivered",
+      "trackingNumber": "DIGITAL-INSTANT",
+      "createdAt": "2026-03-18T16:20:00.000Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "name": "Daniel Craig",
+      "email": "daniel@gymfan.com",
+      "subject": "Inquiry about 1-on-1 VIP Coaching",
+      "message": "Hello Marcus, I want to prepare for a marathon while maintaining muscle mass. Is the VIP coaching suited for hybrid training?",
+      "status": "unread",
+      "createdAt": "2026-03-24T08:15:00.000Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-1",
+      "productId": "prod-1",
+      "userName": "David Miller",
+      "rating": 5,
+      "comment": "Top tier quality! Rubber grip is rock solid and does not smell like cheap rubber. Delivered fast.",
+      "createdAt": "2026-03-12T14:00:00.000Z"
+    },
+    {
+      "id": "rev-2",
+      "productId": "prod-2",
+      "userName": "Elena Rostova",
+      "rating": 5,
+      "comment": "Dissolves instantly with no clumps! French vanilla flavor with oats is my go-to post-workout meal.",
+      "createdAt": "2026-03-15T18:30:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  // Force a dark editor theme so default code colors are readable
+  "workbench.colorTheme": "Dark Modern",
+  // Apply explicit token colors to code text, not just brackets
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "foreground": "#6A9955"
+        }
+      },
+      {
+        "scope": "keyword, storage.type, storage.modifier",
+        "settings": {
+          "foreground": "#C586C0"
+        }
+      },
+      {
+        "scope": "string",
+        "settings": {
+          "foreground": "#CE9178"
+        }
+      },
+      {
+        "scope": "entity.name.function, support.function",
+        "settings": {
+          "foreground": "#DCDCAA"
+        }
+      },
+      {
+        "scope": "variable, entity.name.variable, variable.other.property",
+        "settings": {
+          "foreground": "#9CDCFE"
+        }
+      },
+      {
+        "scope": "constant.numeric",
+        "settings": {
+          "foreground": "#B5CEA8"
+        }
+      }
+    ]
+  },
+  "editor.semanticTokenColorCustomizations": {
+    "enabled": true,
+    "rules": {
+      "function": "#DCDCAA",
+      "variable": "#9CDCFE",
+      "property": "#9CDCFE"
+    }
+  },
+  // ====================================================================
+  // 🌈 BRACKET PAIR & GUIDE STYLES
+  // ====================================================================
+  // Colorize matching brackets with distinct rainbow colors
+  "editor.bracketPairColorization.enabled": true,
+  // Render vertical bracket pair guide lines
+  "editor.guides.bracketPairs": "active",
+  // Render horizontal lines connecting matching brackets
+  "editor.guides.bracketPairsHorizontal": "active",
+  // Highlight the active bracket pair enclosing the cursor
+  "editor.guides.highlightActiveBracketPair": true,
+  // Render indentation guides
+  "editor.guides.indentation": true,
+  // Automatically insert matching closing brackets and quotes
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.autoSurround": "languageDefined",
+  // Highlight matching bracket when cursor is next to one
+  "editor.matchBrackets": "always",
+  // ====================================================================
+  // 📐 CODE FORMATTING & INDENTATION STYLES
+  // ====================================================================
+  // Automatically format code whenever you save the file (Ctrl + S)
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": false,
+  // Indentation standard (2 spaces is industry standard for Node.js / JavaScript)
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  // Clean trailing whitespaces and ensure clean newline at end of file
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  // Sticky scroll shows current function/class scope pinned at top of editor
+  "editor.stickyScroll.enabled": true,
+  // ====================================================================
+  // 🖌️ PRETTIER & JAVASCRIPT FORMATTER CONFIGURATION
+  // ====================================================================
+  // Default code formatter for JavaScript and JSON
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // Language specific overrides
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  // Prettier code style options
+  "prettier.semi": true,
+  "prettier.singleQuote": false,
+  "prettier.tabWidth": 2,
+  "prettier.trailingComma": "none",
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "always",
+  "prettier.printWidth": 80
+}
